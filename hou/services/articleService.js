@@ -1,22 +1,63 @@
 const { Pool, promisePool } = require('../models/db')
 
 const articleModel = require('../models/articleModel')
+const fs = require("fs")
+const path = require('path')
 
 const path = require('path')
 const { setTimeout } = require('timers/promises')
 
+/**
+ * @description 切片上传暂存
+ * @type {Record<string,any[]>}
+ * **/
+const temp = {}
+
 const articleService = {
   // 发布 - 文章
   uploadArticle: (req, res) => {
+    const time = new Date()
+    /** @type {string} **/
+    const uid = req.user.data.id
+
+
+    /** @type {number} 最大切片**/
+    const chunkMax = new Number(req.query.maxchunk)
+    /** @type {number} 当前切片**/
+    const nowChunk = new Number(req.query.chunk)
+    temp[uid][nowChunk] = new String(req.body.dataChunk) // 保存当前信息体
+    if (chunkMax == nowChunk) { // 终止接受
+      /**@type {string}**/
+      let data = ""
+      temp[uid].forEach((val) => {
+        data += val
+      })
+      delete temp[uid]; // 删除缓存
+      /** @type {Record<string,any>} 完整数据**/
+      const article = JSON.parse(data)
+      try {
+        article.imgs.forEach((/** base64img @type {string}**/val) => { //逐个写入文件
+          try {
+            fs.writeFile(path.join(__dirname, '../public/uploads', `${uid}_${time.getDate()}`), val)
+          } catch {
+            throw 'err!!'
+          }
+        })
+        fs.writeFile(path.join(__dirname, '../public/uploads', `${uid}_${time.getDate()}`), article.cover_img)
+      } catch {
+        return res.codeMsg('发布文章失败！')
+      }
+    }
+
     const articleInfo = {
       // 标题、内容、状态、所属的分类Id
       ...req.body,
       // 文章封面在服务器端的存放路径
-      cover_img: path.join('/public/uploads', req.file.filename),
+      cover_img: path.join('/public/uploads', `${uid}_${time.getDate()}`),
       // 文章发布时间
-      pub_date: new Date(),
+      pub_date: time,
       // 文章作者的Id
-      author_id: req.user.data.id
+      author_id: uid
     }
     Pool.query(articleModel.insertArticle, articleInfo, function (err, rows) {
       if (err) return res.codeMsg(err)
