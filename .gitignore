@@ -1,0 +1,7 @@
+qian/node_modules
+qian/package-lock.json
+qian/yarn.lock
+
+hou/node_modules
+hou/public/uploads/*
+hou/yarn.lock
