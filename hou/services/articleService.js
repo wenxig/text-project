@@ -5,7 +5,7 @@ const fs = require("fs")
 const path = require('path')
 
 const path = require('path')
-const { setTimeout } = require('timers/promises')
+// const { setTimeout } = require('timers/promises') // 没有使用
 
 /**
  * @description 切片上传暂存
@@ -43,7 +43,7 @@ const articleService = {
             throw 'err!!'
           }
         })
-        fs.writeFile(path.join(__dirname, '../public/uploads', `${uid}_${time.getDate()}`), article.cover_img)
+        fs.writeFile(path.join(__dirname, '../public/uploads', `${uid}_coverimg`), article.cover_img)
       } catch {
         return res.codeMsg('发布文章失败！')
       }
@@ -53,7 +53,7 @@ const articleService = {
       // 标题、内容、状态、所属的分类Id
       ...req.body,
       // 文章封面在服务器端的存放路径
-      cover_img: path.join('/public/uploads', `${uid}_${time.getDate()}`),
+      cover_img: path.join('/public/uploads', `${uid}_coverimg`),
       // 文章发布时间
       pub_date: time,
       // 文章作者的Id
