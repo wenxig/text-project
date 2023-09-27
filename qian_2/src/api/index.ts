@@ -1,5 +1,6 @@
-import reqAxios from '@/utils/axios'
-
+import reqAxios, { baseURL } from '@/utils/axios'
+import { ceil } from 'lodash-es';
+import { compress } from 'lz-string';
 interface User {
   username?: string
   password?: string
@@ -159,12 +160,17 @@ export const delArtCateAPI = (id: string) => {
   })
 }
 
-export const uploadArticleAPI = (json: Record<any, any>, chunk: number, maxChunk: number) => {
-  return reqAxios({
-    url: `/my/article/add?chunk=${chunk}&maxchunk=${maxChunk}`,
-    method: 'POST',
-    data: json
-  })
+export const uploadArticleAPI = (json: Record<"article" | "cover_img", string>) => {
+  const ws = new WebSocket(`${baseURL}/my/article/add`);
+  const valStr = compress(JSON.stringify(json))
+  ws.onopen = () => {
+    let s = 0
+    for (let index = 1; index < ceil(valStr.length / 1000); index++) {
+      ws.send(valStr.substring(s, index * 1000))
+      s += 1000;
+    }
+    ws.close()
+  }
 }
 
 type GetArticleList = {

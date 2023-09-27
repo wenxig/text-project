@@ -29,7 +29,6 @@ exports.addUser = (req, res) => {
 exports.loginUser = (req, res) => {
   // 接收数据
   const { username, password } = req.body
-
   // 1、用户登录
   userService.loginUser(username, password, res)
 

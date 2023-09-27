@@ -1,15 +1,20 @@
 const articleService = require('../services/articleService')
 
 // 发布 - 文章
-exports.uploadArticle = (req, res) => {
-  //交由前端检测
-  // 1、文章封面是否存在（校验schema）
-  // if (!req.file || req.file.fieldname !== 'cover_img') {
-  //   return res.codeMsg('文章封面是必选参数！')
-  // }
-
-  // 2、发布文章
-  articleService.uploadArticle(req, res)
+exports.uploadArticle = (ws) => {
+  let smsg=""
+  ws.on('message', function (msg) {
+    smsg += msg
+  })
+  ws.on("close",()=>{
+    const article = JSON.parse(smsg)
+    // 1、文章封面是否存在（校验schema）(有必要后端检测吗)
+    if (!article.cover_img) {
+      return res.codeMsg('文章封面是必选参数！')
+    }
+    // 2、发布文章
+    articleService.uploadArticle(req, res)
+  })
 }
 
 // 获取 - 文章列表

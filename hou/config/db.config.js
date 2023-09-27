@@ -1,15 +1,13 @@
-module.exports = {
-  host: 'localhost',
-  user: 'admin',
-  password: '123456',
-  database: 'bigevent_api',
-  connectionLimit: 2 //创建的连接池个数
-}
+const os = require('os');
+module.exports = os.type() == 'Darwin' ? {
+  host: 'mongodb://127.0.0.1:27017/',
+  database: 'ysck',
 
-// module.exports = {
-//   host: '101.200.148.224',
-//   user: 'bigevent-api',
-//   password: 'zayth2HWdjL2BXHR',
-//   database: 'bigevent-api',
-//   connectionLimit: 2 //创建的连接池个数
-// }
+} : (os.type() == 'Windows_NT' ? {
+  host: '',
+  database: '',
+
+} : {
+  host: '101.200.148.224',
+  database: '',
+})

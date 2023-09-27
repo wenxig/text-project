@@ -1,14 +1,22 @@
 import { RouteRecordRaw } from 'vue-router';
-import Root from '@p/index.vue';
 export default <RouteRecordRaw[]>[
   {
     path: '/',
-    component: Root
+    redirect: "/auth/login",
   }, {
-    path: '/login',
-    component: () => import("@p/login/index.vue")
+    path: '/auth',
+    component: () => import("@p/auth/index.vue"),
+    children: [
+      {
+        path: 'login',
+        component: () => import("@p/auth/login/index.vue")
+      }, {
+        path: 'register',
+        component: () => import("@p/auth/register/index.vue")
+      }
+    ]
   }, {
-    path: '/register',
-    component: () => import("@p/login/index.vue")
+    path: '/home/:name',
+    component: () => import("@p/home/index.vue")
   }
 ]

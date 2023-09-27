@@ -1,6 +1,5 @@
 const express = require('express')
 const router = express.Router()
-
 const articleController = require('../controllers/articleController')
 
 // 1、合法性校验
@@ -11,23 +10,11 @@ const {
   get_delArticle_schema
 } = require('../schemas/articleSchema')
 
-
-// 2、解析multipart / form-data数据（主要是图片）
-// const multer = require('multer')
-
-// —— 通过实例对象multer、fs模块指定文件的存放路径
-// const upload = multer({ dest: path.join(__dirname, '../public/uploads/') })
-
-// 1、发布-文章
-router.post(
-  '/add', articleController.uploadArticle)
-
 // 2、获取-文章列表
 router.get(
   '/list',
   expressJoi(getArticleList_schema),
-  articleController.getArticleList
-)
+  articleController.getArticleList)
 
 // 3、获取-文章详情
 router.get(

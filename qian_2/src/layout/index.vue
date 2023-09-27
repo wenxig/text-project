@@ -1,11 +1,63 @@
 <script setup lang="ts">
-// import { getMenusAPI } from '@/api/index'
 import { reactive } from 'vue';
-const menus = reactive<{ value: any[] }>({ value: [] })
-
+import { UserFilled } from '@element-plus/icons-vue'
+const menus = reactive([
+  {
+    indexPath: '/home',
+    title: '首页',
+    icon: 'el-icon-s-home',
+    children: null
+  },
+  {
+    indexPath: '2',
+    title: '文章管理',
+    icon: 'el-icon-s-order',
+    children: [
+      {
+        indexPath: '/art-cate',
+        title: '文章分类',
+        icon: 'el-icon-s-data'
+      },
+      {
+        indexPath: '/art-list',
+        title: '文章列表',
+        icon: 'el-icon-document-copy'
+      }
+    ]
+  },
+  {
+    indexPath: '3',
+    title: '个人中心',
+    icon: 'el-icon-user-solid',
+    children: [
+      {
+        indexPath: '/user-info',
+        title: '基本资料',
+        icon: 'el-icon-s-operation'
+      },
+      {
+        indexPath: '/user-avatar',
+        title: '更换头像',
+        icon: 'el-icon-camera'
+      },
+      {
+        indexPath: '/user-avatarPro',
+        title: '更换头像',
+        icon: 'el-icon-camera-solid'
+      },
+      {
+        indexPath: '/user-pwd',
+        title: '重置密码',
+        icon: 'el-icon-key'
+      }
+    ]
+  }
+])
 import { ElMessageBox, ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router';
+import { useUserStore } from '@/store';
 const router = useRouter()
+const userStore = useUserStore()
 function logout() {
   ElMessageBox.confirm('您确认退出登录吗', '提示', {
     confirmButtonText: '确定',
@@ -13,41 +65,33 @@ function logout() {
     type: 'warning'
   }).then(() => {
     ElMessage.success('退出成功!')
-    // store 操作-
-    // end
+    userStore.userInfo = {
+      nickname: "",
+      user_pic: "",
+      username: ""
+    }
+    userStore.token = ""
     router.replace('/login')
   }).catch(() => {
     ElMessage.info('已取消退出操作')
   })
 }
-
-(async function () {
-  const { data: res } = await getMenusAPI()
-  // console.log(res)
-  // console.log(res.data)
-  // 数据处理
-  menus.value = res.data
-})()
 </script>
 
 <template>
   <div class="comLayout-container">
-    <!-- 使用element-ui的✨布局容器 -->
     <el-container class="main-container">
-      <!-- 1、头部区域 -->
       <el-header>
         <!-- 左侧logo -->
-        <!-- <img src="../../assets/images/logo.png" alt="" /> -->
-        <div class="title-box">个人笔记库后台系统</div>
-        <!-- 右侧菜单 —— 采用element-ui的✨导航菜单 -->
+        <img src="/favicon.svg" alt="logo" />
+        <div class="title-box">个人笔记后台管理系统</div>
         <el-menu class="el-menu-top" mode="horizontal" background-color="#2e3846" text-color="#fff"
           active-text-color="#409EFF" router>
-          <!-- 个人中心 —— 使用element-ui的图标 -->
           <el-submenu index="1">
             <template slot="title">
               <!-- 头像 -->
-              <img v-if="!$store.state.userInfo.user_pic" src="../../assets/images/avatar.jpg" alt="" class="avatar" />
-              <img v-else :src="$store.state.userInfo.user_pic" alt="" class="avatar" />
+              <el-avatar v-if="!userStore.userInfo.user_pic" :icon="UserFilled" :size="35" class="!ml-[10px]" />
+              <el-avatar v-else :src="userStore.userInfo.user_pic" :size="35" fit="cover" class="!ml-[10px]" />
               <span>个人中心</span>
             </template>
             <el-menu-item index="/layout/user-info"><i class="el-icon-s-operation"></i>基本资料</el-menu-item>
@@ -56,38 +100,30 @@ function logout() {
             <el-menu-item index="/layout/user-pwd"><i class="el-icon-key"></i>重置密码</el-menu-item>
           </el-submenu>
           <!-- 退出 -->
-          <!-- 此处对index特殊✨处理，防止其受router属性的影响 -->
           <el-menu-item index="" @click="logout"><i class="el-icon-switch-button"></i>退出</el-menu-item>
         </el-menu>
       </el-header>
       <el-container>
-        <!-- 2、侧边栏区域 -->
         <el-aside width="200px">
           <div class="user-box">
-            <img v-if="user_pic" :src="user_pic" alt="" />
-            <img v-else src="../../assets/images/logo.png" alt="" />
-            <span>欢迎 {{ nickname || username }}</span>
+            <el-avatar v-if="!userStore.userInfo.user_pic" :icon="UserFilled" :size="35" />
+            <el-avatar v-else :src="userStore.userInfo.user_pic" :size="35" fit="cover" />
+            <span>欢迎 {{ userStore.userInfo.nickname || userStore.userInfo.username }}</span>
           </div>
-          <!-- 侧边栏导航部分 -->
           <el-menu :default-active="$route.path" class="el-menu-vertical-demo" background-color="#2e3846"
             text-color="#fff" active-text-color="#409EFF" unique-opened router>
-            <!-- 外部嵌套template标签 -->
-            <!-- ① 进行数据的一次循环 -->
-            <template v-for="item in menus.value">
-              <!-- 不包含二级菜单 -->
+            <template v-for="item in menus">
               <el-menu-item v-if="item.children === null" :index="'/layout' + item.indexPath"
                 :key="'/layout' + item.indexPath">
                 <i :class="item.icon"></i>
                 <span slot="title">{{ item.title }}</span>
               </el-menu-item>
 
-              <!-- 包含二级菜单 -->
               <el-submenu v-else :index="'/layout' + item.indexPath">
                 <template slot="title">
                   <i :class="item.icon"></i>
                   <span>{{ item.title }}</span>
                 </template>
-                <!-- ② 进行数据的二次循环 -->
                 <el-menu-item v-for="subItem in item.children" :key="'/layout' + subItem.indexPath"
                   :index="'/layout' + subItem.indexPath">
                   <i :class="subItem.icon"></i>{{ subItem.title }}
@@ -97,19 +133,15 @@ function logout() {
           </el-menu>
         </el-aside>
         <el-container>
-          <!-- 3.1页面主体区域 -->
-          <el-main>
-            <router-view></router-view>
-          </el-main>
-          <!-- 3.2底部footer区域 -->
-          <el-footer><a target="_blank" href="https://github.com/Lencamo/big-event-cms">© Lencamo</a></el-footer>
+          <slot></slot>
+          <el-footer><a target="_blank" href="https://github.com/wenxig">?</a></el-footer>
         </el-container>
       </el-container>
     </el-container>
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .comLayout-container {
   height: 100%;
 
@@ -143,14 +175,6 @@ function logout() {
   }
 }
 
-.avatar {
-  border-radius: 50%;
-  width: 35px;
-  height: 35px;
-  background-color: #fff;
-  margin-right: 10px;
-  object-fit: cover;
-}
 
 // 左侧边栏用户信息区域
 .user-box {

@@ -44,12 +44,20 @@
       ]
     },
     "types": [
-      "element-plus/global"
+      "element-plus/global",
     ],
     "allowSyntheticDefaultImports": true
   },
   "include": [
-    "src/**/*",
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
     "package.json",
   ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }

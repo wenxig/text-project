@@ -4,7 +4,7 @@ const router = express.Router()
 const userController = require('../controllers/userController')
 
 // 合法性校验
-const expressJoi = require('../schemas//express-joi')
+const expressJoi = require('../schemas/express-joi')
 const { reg_login_schema } = require('../schemas/userSchema')
 
 // 注册

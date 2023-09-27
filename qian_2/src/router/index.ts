@@ -11,7 +11,7 @@ const router = createRouter({
 })
 
 // 权限访问控制
-const whiteList = ['/login', '/register'] // 白名单页面 (登陆，注册)
+const whiteList = ['/auth/login', '/auth/register'] // 白名单页面 (登陆，注册)
 router.beforeEach(async (to) => {
   const $store = useUserStore()
   const token = $store.token
@@ -27,7 +27,7 @@ router.beforeEach(async (to) => {
     if (whiteList.includes(to.path)) {
       return true
     } else {
-      return '/login'
+      return '/auth/login'
     }
   }
 })

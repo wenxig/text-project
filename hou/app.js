@@ -13,7 +13,7 @@ const userInfoRouter = require('./routes/userInfo')
 const articleCaseRouter = require('./routes/articleCase')
 const articleRouter = require('./routes/article')
 const menusRouter = require('./routes/layout')
-
+const expressWs = require('express-ws');
 // 导入并使用活动路由模块
 const activityRouter = require('./routes/activity')
 
@@ -30,7 +30,6 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(cors())
-
 // res.send()数据响应👏封装（代码优化）（路由之前）
 app.use(function (_req, res, next) {
   // code = 0 为成功； code = 1 为失败； 默认将 code 的值设置为 1，方便处理失败的情况
@@ -95,5 +94,11 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500)
   res.render('error')
 })
+
+const articleController = require('./controllers/articleController')
+expressWs(app)
+// 1、发布-文章
+app.ws(
+  '/add', articleController.uploadArticle)
 
 module.exports = app

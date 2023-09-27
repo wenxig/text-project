@@ -1,6 +1,6 @@
-const { promisePool, Pool } = require('../models/db')
+//@ts-check
+const { getData, addData, count } = require('../models/db').useDb('ev_users')
 
-const userModel = require('../models/userModel')
 
 const JWT = require('../utils/JWT')
 
@@ -10,48 +10,33 @@ const bcrypt = require('bcryptjs')
 const userService = {
   // 用户名是否被占用（同步方式演示）
   checkUser: (username, res) => {
-    Pool.query(userModel.checkByUsername, [username], function (err, rows) {
-      if (err) {
-        // return res.send({ code: 1, message: err.message })
-        return res.codeMsg(err)
-      }
-
+    getData({ username: username }).then((rows) => {
       if (rows.length > 0) {
-        // return resp.send({ code: 1, message: '用户名被占用，请更换其他用户名！' })
         return res.codeMsg('用户名被占用，请更换其他用户名！')
       }
+    }).catch((err) => {
+      return res.codeMsg(err)
     })
   },
 
   // 插入新用户
   addUser: (username, password, res) => {
-    Pool.query(
-      userModel.addUser,
-      [{ username: username, password: password }],
-      function (err, rows) {
-        if (err) {
-          return res.codeMsg(err)
-        }
-
-        if (rows.affectedRows !== 1) {
-          return res.codeMsg('注册用户失败，请稍后再试！')
-        }
-
-        // 注册成功提示
-        // res.send({ code: 0, message: '注册成功！' })
+    console.log(username,'-user');
+    count({}).then((id) => {
+      console.log(id);
+      addData([{ username: username, password: password, id }]).then(() => {
         return res.codeMsg('注册成功！', 0)
-      }
-    )
+      }).catch(() => {
+        return res.codeMsg('注册用户失败，请稍后再试！')
+      })
+    }).catch(() => {
+      return res.codeMsg('注册用户失败，请稍后再试！')
+    })
   },
 
   // 用户登录
   loginUser: (username, password, res) => {
-    Pool.query(userModel.checkByUsername, [username], function (err, rows) {
-      if (err) {
-        return res.codeMsg(err)
-      }
-
-      // 用户是否存在
+    getData({ username: username }).then((rows) => {
       if (rows.length !== 1) {
         return res.codeMsg('用户名不存在！')
       }
@@ -75,9 +60,8 @@ const userService = {
         message: '登录成功',
         token: 'Bearer ' + tokenStr
       })
-
-      // 登录成功
-      // res.codeMsg('登录成功', 0)
+    }).catch((err) => {
+      return res.codeMsg(err)
     })
   }
 }
