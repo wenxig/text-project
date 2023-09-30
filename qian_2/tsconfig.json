@@ -45,6 +45,7 @@
     },
     "types": [
       "element-plus/global",
+      // "src/env.d.ts"
     ],
     "allowSyntheticDefaultImports": true
   },

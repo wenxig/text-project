@@ -6,7 +6,9 @@ export const useUserStore = defineStore("userStore", () => {
   const userInfo = useLocalStorage("store.userInfo", <userInfo>{
     nickname: "",
     username: "",
-    user_pic: ""
+    user_pic: "",
+    id: 0,
+    email: "",
   })
   async function initUserInfo() {
     const { getUserInfoAPI } = await import('@/api')
@@ -22,4 +24,6 @@ interface userInfo {
   nickname: string;
   username: string;
   user_pic: string;
+  id: number,
+  email: string,
 }

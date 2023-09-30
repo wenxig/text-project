@@ -8,30 +8,27 @@ const path = require('path')
 
 const articleService = {
   // 发布 - 文章
-  uploadArticle: (req, res) => {
-    const time = new Date().getDate()
-    /** @type {string} **/
-    const uid = req.user.data.id
-    const article = JSON.parse(req.body)
-    try {
-      fs.writeFile(path.join(__dirname, `../public/uploads/${uid}_${time}`, 'article.html'), article.article, () => { })
+  uploadArticle: (msg, cb) => {
+    const { id: uid, body } = JSON.parse(msg)
+    const time = new Date().getTime()
+    const article = body
+    fs.mkdir(path.join(__dirname, `../public/uploads/${uid}_${time}`), () => {
+      fs.writeFile(path.join(__dirname, `../public/uploads/${uid}_${time}`, 'article.md'), article.article, () => { })
       fs.writeFile(path.join(__dirname, `../public/uploads/${uid}_${time}`, 'cover_img.txt'), article.cover_img, () => { })
-    } catch {
-      return res.codeMsg('发布文章失败！')
-    }
+    })
     const articleInfo = {
-      // 标题、内容、状态、所属的分类Id
-      ...req.body,
+      title: article.title,
+      cate_id: article.cate_id,
       // 文章封面在服务器端的存放路径
       cover_img: path.join(__dirname, `../public/uploads/${uid}_${time}`, 'cover_img.txt'),
       // 文章发布时间
       pub_date: time,
       // 文章作者的Id
-      author_id: uid
+      author_id: uid,
+      state: article.state,
+      article: path.join(__dirname, `../public/uploads/${uid}_${time}`, 'article.md')
     }
-    addData(articleInfo)
-      .then(() => res.codeMsg('发布文章成功！', 0))
-      .catch(() => res.codeMsg('发布文章失败！'))
+    addData([articleInfo]).then(() => cb({ msg: "上传成功", type: true })).catch(() => cb({ msg: "上传失败", type: false }))
   },
 
   // 获取 - 文章列表：文章条数total

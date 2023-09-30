@@ -6,7 +6,7 @@ const $store = useUserStore()
 
 // 为图片准备基地址
 // dev:127 server: big-event
-export const baseURL = (<any>import.meta).env.DEV ? 'http://127.0.0.1:3000' : 'http://big-event-vue-api-t.itheima.net'
+export const baseURL = (<any>import.meta).env.DEV ? '/api' : 'http://big-event-vue-api-t.itheima.net'
 
 // 创建一个自定的axios方法(比原axios多了个基地址)
 // axios函数请求的url地址前面会被拼接基地址, 然后axios请求baseURL+url后台完整地址
@@ -45,12 +45,12 @@ export default reqAxios
 
 // 重试
 //@ts-ignore
-axios.defaults.retry = 3; //重试次数
+reqAxios.defaults.retry = 3; //重试次数
 //@ts-ignore
-axios.defaults.retryDelay = 1000;//重试延时
+reqAxios.defaults.retryDelay = 1000;//重试延时
 //@ts-ignore
-axios.defaults.shouldRetry = (error) => true;//重试条件，默认只要是错误都需要重试
-axios.interceptors.response.use(undefined, async (err) => {
+reqAxios.defaults.shouldRetry = (error) => true;//重试条件，默认只要是错误都需要重试
+reqAxios.interceptors.response.use(undefined, async (err) => {
   const config = err.config;
   if (!config || !config.retry || !config.shouldRetry || typeof config.shouldRetry != 'function' || !config.shouldRetry(err)) {
     return Promise.reject(err);

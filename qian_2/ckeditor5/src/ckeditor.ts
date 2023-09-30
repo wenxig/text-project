@@ -18,31 +18,33 @@ import {
 	Underline
 } from '@ckeditor/ckeditor5-basic-styles';
 import { BlockQuote } from '@ckeditor/ckeditor5-block-quote';
+import { CloudServices } from '@ckeditor/ckeditor5-cloud-services';
 import { CodeBlock } from '@ckeditor/ckeditor5-code-block';
 import { Essentials } from '@ckeditor/ckeditor5-essentials';
 import { FindAndReplace } from '@ckeditor/ckeditor5-find-and-replace';
 import { FontBackgroundColor, FontColor, FontFamily, FontSize } from '@ckeditor/ckeditor5-font';
-import { Heading, Title } from '@ckeditor/ckeditor5-heading';
+import { Heading } from '@ckeditor/ckeditor5-heading';
 import { Highlight } from '@ckeditor/ckeditor5-highlight';
 import { HorizontalLine } from '@ckeditor/ckeditor5-horizontal-line';
 import { GeneralHtmlSupport } from '@ckeditor/ckeditor5-html-support';
 import {
+	AutoImage,
 	Image,
 	ImageCaption,
 	ImageInsert,
 	ImageResize,
 	ImageStyle,
 	ImageToolbar,
-	ImageUpload
+	ImageUpload,
 } from '@ckeditor/ckeditor5-image';
 import { Indent, IndentBlock } from '@ckeditor/ckeditor5-indent';
 import { TextPartLanguage } from '@ckeditor/ckeditor5-language';
-import { Link, LinkImage } from '@ckeditor/ckeditor5-link';
-import { List, ListProperties } from '@ckeditor/ckeditor5-list';
-import { MediaEmbed } from '@ckeditor/ckeditor5-media-embed';
+import { AutoLink, Link, LinkImage } from '@ckeditor/ckeditor5-link';
+import { List, ListProperties, TodoList } from '@ckeditor/ckeditor5-list';
+import { Markdown } from '@ckeditor/ckeditor5-markdown-gfm';
+import { MediaEmbed, MediaEmbedToolbar } from '@ckeditor/ckeditor5-media-embed';
 import { PageBreak } from '@ckeditor/ckeditor5-page-break';
 import { Paragraph } from '@ckeditor/ckeditor5-paragraph';
-import { PasteFromOffice } from '@ckeditor/ckeditor5-paste-from-office';
 import { RemoveFormat } from '@ckeditor/ckeditor5-remove-format';
 import { SelectAll } from '@ckeditor/ckeditor5-select-all';
 import {
@@ -73,11 +75,14 @@ import { WordCount } from '@ckeditor/ckeditor5-word-count';
 class Editor extends ClassicEditor {
 	public static override builtinPlugins = [
 		Alignment,
+		AutoImage,
+		AutoLink,
 		Autoformat,
 		Autosave,
 		Base64UploadAdapter,
 		BlockQuote,
 		Bold,
+		CloudServices,
 		Code,
 		CodeBlock,
 		Essentials,
@@ -104,10 +109,11 @@ class Editor extends ClassicEditor {
 		LinkImage,
 		List,
 		ListProperties,
+		Markdown,
 		MediaEmbed,
+		MediaEmbedToolbar,
 		PageBreak,
 		Paragraph,
-		PasteFromOffice,
 		RemoveFormat,
 		SelectAll,
 		SpecialCharacters,
@@ -129,7 +135,7 @@ class Editor extends ClassicEditor {
 		TableToolbar,
 		TextPartLanguage,
 		TextTransformation,
-		Title,
+		TodoList,
 		Underline,
 		WordCount
 	];
@@ -138,44 +144,43 @@ class Editor extends ClassicEditor {
 		toolbar: {
 			items: [
 				'heading',
-				'style',
 				'undo',
 				'redo',
 				'|',
-				'outdent',
-				'indent',
-				'alignment',
 				'bulletedList',
 				'numberedList',
+				'outdent',
+				'indent',
 				'|',
-				'imageUpload',
-				'imageInsert',
+				'ImageUpload',
 				'blockQuote',
 				'insertTable',
 				'mediaEmbed',
+				'link',
+				'horizontalLine',
+				'pageBreak',
+				'findAndReplace',
+				'todoList',
 				'code',
 				'codeBlock',
-				'|',
-				'pageBreak',
-				'|',
-				'findAndReplace',
 				'-',
+				'style',
 				'textPartLanguage',
+				'|',
+				'fontSize',
+				'fontFamily',
+				'fontColor',
 				'bold',
 				'italic',
 				'underline',
-				'link',
 				'fontBackgroundColor',
-				'fontColor',
-				'fontFamily',
-				'fontSize',
-				'removeFormat',
-				'strikethrough',
 				'highlight',
-				'horizontalLine',
+				'removeFormat',
 				'subscript',
 				'superscript',
-				'specialCharacters'
+				'specialCharacters',
+				'strikethrough',
+				'alignment'
 			],
 			shouldNotGroupWhenFull: true
 		},

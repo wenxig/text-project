@@ -52,5 +52,22 @@ export default defineConfig({
       '@s': fileURLToPath(new URL('./src/store', import.meta.url)),
       '@p': fileURLToPath(new URL('./src/pages', import.meta.url))
     }
-  }
+  },
+  server: {
+    // https: true,
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:3000',
+        changeOrigin: true, // 允许跨域
+        ws: true,  // 允许websocket代理
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+      '/wsapi': {
+        target: 'ws://127.0.0.1:3000',
+        changeOrigin: true, // 允许跨域
+        ws: true,  // 允许websocket代理
+        rewrite: (path) => path.replace(/^\/wsapi/, ""),
+      }
+    },
+  },
 })

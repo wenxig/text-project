@@ -22,8 +22,8 @@ exports.updatePassword = (req, res) => {
 }
 
 // 更新-用户头像
-exports.updateAvatar = (req, res) => {
-  userInfoService.updateAvatar(req, res)
+exports.updateAvatar = (data,ws) => {
+  userInfoService.updateAvatar(data,ws)
 
   // res.codeMsg('ok')
 }

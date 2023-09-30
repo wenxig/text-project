@@ -28,11 +28,4 @@ router.patch(
   userInfoController.updatePassword
 )
 
-// 4、更新-用户头像
-router.patch(
-  '/update/avatar',
-  expressJoi(updateAvatar_schema),
-  userInfoController.updateAvatar
-)
-
 module.exports = router

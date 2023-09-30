@@ -4,17 +4,19 @@ import CKEditor from "@ckeditor/ckeditor5-vue";
 import ClassicEditor from "ckeditor5-build-classic";
 const state = reactive({
   editor: ClassicEditor,
-  editorData: "",
+  context: "",
   editorConfig: {
   } as import("@ckeditor/ckeditor5-core").EditorConfig,
 });
 
-defineEmits<{
-  (e: 'change', value: string): void
+const emit = defineEmits<{
+  (e: 'getGetCtnFn', value: () => string): void
 }>()
+emit("getGetCtnFn", () => {
+  return state.context
+})
 </script>
 
 <template>
-  <CKEditor.component :editor="state.editor" v-model="state.editorData" :config="(state.editorConfig as any)"
-    @input="$emit('change', state.editorData)" />
+  <CKEditor.component :editor="state.editor" v-model:model-value="state.context" :config="(state.editorConfig as any)" />
 </template>

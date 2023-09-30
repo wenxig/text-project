@@ -50,12 +50,12 @@ const loginRules = reactive<FormRules<LoginForm>>({
     }
   ]
 })
-
 function login(form?: FormInstance) {
   if (!form) return
   form.validate(async (valid) => {
     if (!valid) return false
     const { data: res } = await loginAPI(loginForm)
+
     if (res.code === 0) {
       ElMessage.success(res.message)
       userStore.token = res.token
