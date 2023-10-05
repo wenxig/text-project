@@ -1,7 +1,5 @@
-import { useUserStore } from '@/store';
 import reqAxios from '@/utils/axios'
 import { req as reqWs } from '@/utils/ws';
-const user = useUserStore()
 interface User {
   username?: string
   password?: string
@@ -76,7 +74,7 @@ export const updateUserInfoAPI = ({
 }
 
 export const updateAvatarAPI = (avatar: string) => {
-  reqWs("/my/update/avatar", { img: avatar })
+  return reqWs("/my/update/avatar", { img: avatar })
 }
 
 type UpdatePwd = {
@@ -110,21 +108,27 @@ export const getArtCateListAPI = () => {
 
 
 interface Artcate {
-  cate_name: string
-  cate_alias: string
-  id: string
+  cate_name?: string
+  cate_alias?: string
+  id?: string
 }
 
 export const addArtCateAPI = ({
   cate_name,
-  cate_alias
+  cate_alias,
+  id
 }: Artcate) => {
+  console.log('addd');
+
   return reqAxios({
     url: '/my/cate/add',
     method: 'POST',
     data: {
       cate_name,
       cate_alias
+    },
+    params: {
+      id: id ?? new Date().getTime()
     }
   })
 }
@@ -156,7 +160,7 @@ export const delArtCateAPI = (id: string) => {
 }
 
 export const uploadArticleAPI = (json: Record<string, string>) => {
-  reqWs("/article/add", json)
+  return reqWs("/article/add", json)
 }
 
 type GetArticleList = {
@@ -182,21 +186,21 @@ export const getArticleListAPI = ({
   })
 }
 
-export const getArticleDetailFn = (id: string) => {
+export const getArticleDetailFn = (pub_date: number) => {
   return reqAxios({
     url: '/my/article/info',
     params: {
-      id
+      pub_date
     }
   })
 }
 
-export const delArticleAPI = (id: string) => {
+export const delArticleAPI = (pub_date: number) => {
   return reqAxios({
     url: '/my/article/info',
     method: 'DELETE',
     params: {
-      id
+      pub_date
     }
   })
 }

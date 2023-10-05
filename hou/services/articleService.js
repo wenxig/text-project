@@ -1,10 +1,7 @@
-//@ts-check
-
-const { aggregate, addData, count, updateData } = require('../models/db').useDb("ev_articles")
-
+const { addData, count, updateData, getData, deleteData } = require('../models/db').useDb("ev_articles")
+const lodash = require("lodash")
 const fs = require("fs")
 const path = require('path')
-
 
 const articleService = {
   // 发布 - 文章
@@ -20,13 +17,13 @@ const articleService = {
       title: article.title,
       cate_id: article.cate_id,
       // 文章封面在服务器端的存放路径
-      cover_img: path.join(__dirname, `../public/uploads/${uid}_${time}`, 'cover_img.txt'),
+      cover_img: path.join(`/${uid}_${time}`, 'cover_img.txt'),
       // 文章发布时间
       pub_date: time,
       // 文章作者的Id
       author_id: uid,
       state: article.state,
-      article: path.join(__dirname, `../public/uploads/${uid}_${time}`, 'article.md')
+      article: path.join(`/${uid}_${time}`, 'article.md')
     }
     addData([articleInfo]).then(() => cb({ msg: "上传成功", type: true })).catch(() => cb({ msg: "上传失败", type: false }))
   },
@@ -43,99 +40,32 @@ const articleService = {
   },
 
   // 获取 - 文章列表：获取数据（附加筛选功能✨）
-  getArticleList: (req, res, totalValue) => {
+  getArticleList: (/**@type {import("express").Request<{}, any, any, qs.ParsedQs, Record<string, any>>}*/req, res, totalValue) => {
     // 当前页的第一个索引值
-    const pageIndex = (req.query.pagenum - 1) * req.query.pagesize
-    aggregate([
-      {
-        $match: {
-          state: "已发布"
-        }
-      },
-      {
-        $lookup: {
-          from: "ev_article_cate",
-          localField: "cate_id",
-          foreignField: "id",
-          as: "category"
-        }
-      },
-      {
-        $unwind: "$category"
-      },
-      {
-        $project: {
-          id: "$_id",
-          title: 1,
-          pub_date: 1,
-          state: 1,
-          "category.cate_name": 1,
-          "category.pic_Url": 1,
-          content: 1
-        }
-      },
-      {
-        $skip: pageIndex
-      },
-      {
-        $limit: req.query.pagesize
-      }
-    ]).then((rows) => res.send({
-      code: 0,
-      message: '获取文章列表成功！',
-      total: totalValue,
-      data: rows
-    })).catch((err) => res.codeMsg(err))
+    const /** @type {import("mongodb").Filter<import("bson").Document>} */ searchRule = {}
+    if (!lodash.isEmpty(req.query.cate_id)) {
+      searchRule.cate_id = req.query.cate_id
+    }
+    if (!lodash.isEmpty(req.query.state)) {
+      searchRule.state = req.query.state
+    }
+    getData(searchRule).then((rows) => {
+      const chunks = lodash.chunk(rows, lodash.toNumber(req.query.pagesize))
+      res.send({
+        code: 0,
+        message: '获取文章列表成功！',
+        total: totalValue,
+        data: chunks[lodash.toNumber(req.query.pagenum) - 1]
+      })
+    }).catch((err) => res.codeMsg(err))
   },
 
   // 获取 - 文章详情
-  getArticleDetail: (req, res) => {
-    aggregate([{
-      $match: {
-        id: req.query.id
-      }
-    },
-    {
-      $lookup: {
-        from: "ev_article_cate",
-        localField: "cate_id",
-        foreignField: "id",
-        as: "category"
-      }
-    },
-    {
-      $lookup: {
-        from: "ev_users",
-        localField: "author_id",
-        foreignField: "id",
-        as: "author"
-      }
-    },
-    {
-      $unwind: "$category"
-    },
-    {
-      $unwind: "$author"
-    },
-    {
-      $project: {
-        _id: 0, // 不包含 _id 字段
-        id: 1,
-        title: 1,
-        content: 1,
-        cover_img: 1,
-        pub_date: 1,
-        state: 1,
-        cate_id: 1,
-        author_id: 1,
-        "category.cate_name": 1,
-        "category.pic_Url": 1,
-        "author.username": 1,
-        "author.nickname": 1
-      }
-    }]).then((rows) => {
+  getArticleDetail: (/**@type {import("express").Request<{}, any, any, qs.ParsedQs, Record<string, any>>}*/req, res) => {
+    getData({
+      pub_date: lodash.toNumber(req.query.pub_date)
+    }).then((rows) => {
       if (rows.length !== 1) return res.codeMsg('没有查到对应的数据！')
-
       return res.send({
         code: 0,
         message: '获取文章成功！',
@@ -146,7 +76,21 @@ const articleService = {
 
   // 删除 - 文章
   delArticle: (req, res) => {
-    updateData({ id: req.query.id }, { $set: { is_delete: 1 } }).then((rows) => {
+    getData({
+      pub_date: lodash.toNumber(req.query.pub_date)
+    }).then((rows) => {
+      const row = rows[0]
+      const /**@type {string}*/ ap = row.article
+      const pa = path.join(__dirname, '../public/uploads', ap.split('/')[1])
+      fs.rmdir(pa, { recursive: true, force: true }, (err) => {
+        if (err) {
+          console.log(err);
+        }
+      })
+    })
+    deleteData({
+      pub_date: lodash.toNumber(req.query.pub_date)
+    }).then(() => {
       return res.codeMsg('删除成功！', 0)
     }).catch(() => res.codeMsg('您要删除的文章不存在！'))
   }

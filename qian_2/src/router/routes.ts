@@ -40,7 +40,10 @@ export default <RouteRecordRaw[]>[
     component: () => import("@p/article/index.vue"),
     children:[{
       path:'list',
-      component: () => import('@p/article/list.vue')
+      component: () => import('@p/article/list/index.vue')
+    },{
+      path: "cate",
+      component: () => import('@p/article/cate/index.vue')
     }]
   }
 ]

@@ -1,9 +1,15 @@
 //@ts-check
-const { MongoClient } = require('mongodb')
+const { MongoClient, ObjectId } = require('mongodb')
 const dbConfig = require('../config/db.config')
 module.exports = {
   useDb(/**@type {string}*/name) {
     return {
+      /**
+       * @param {string | number | ObjectId | import("bson").ObjectIdLike | Uint8Array} id
+       */
+      createId(id) {
+        return new ObjectId(id)
+      },
       getData: async (/** @type {import("mongodb").Filter<import("bson").Document>} */ filter) => {
         const client = await MongoClient.connect(dbConfig.host)
         const db = client.db(dbConfig.database);

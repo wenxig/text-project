@@ -3,8 +3,9 @@ import ActcetaEdit from '@/components/actcetaEdit.vue';
 import { reactive } from 'vue';
 import { ref } from 'vue';
 import defaultImg from '/cover.jpg'
-import type { FormRules, FormInstance } from 'element-plus';
+import { type FormRules, type FormInstance, ElMessage } from 'element-plus';
 import { uploadArticleAPI } from '@/api';
+
 const props = defineProps<{
   getArtListFn: () => void,
   cateList: any[]
@@ -76,16 +77,7 @@ function pubArticleFn(str: string) {
         title: pubForm.title,
         cate_id: pubForm.cate_id ?? 0,
         state: pubForm.state
-      })
-      // if (res.code !== 0) {
-      //   ElMessage.error('发布文章失败！')
-      // } else {
-      //   ElMessage.success('发布文章成功！')
-
-      //   // 关闭对话框
-      //   pubdialogVisible = false
-
-      //   // 刷新主页面文章列表数据
+      }).then(() => ElMessage.success('发布文章成功！')).catch(() => ElMessage.error('发布文章失败！'))
       props.getArtListFn()
       // }
     } else {

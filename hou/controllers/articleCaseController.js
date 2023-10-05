@@ -1,3 +1,5 @@
+//@ts-check
+
 const articleCaseService = require('../services/articleCaseService')
 // 获取 - 文章分类
 exports.getArtCateList = (req, res) => {
@@ -6,6 +8,7 @@ exports.getArtCateList = (req, res) => {
 
 // 增加 - 文章分类
 exports.addArtCate = (req, res) => {
+
   // 1、分类名、别名查重
   articleCaseService.checkArtCate(req, res)
 
@@ -30,7 +33,7 @@ exports.getArticleDetail = (req, res) => {
 // 更新 - 文章分类
 exports.updateCate = (req, res) => {
   // 1、分类名、别名查重
-  articleCaseService.checkArtCateAll(req, res)
+  // articleCaseService.checkArtCateAll(req, res)
 
   // 2、更新文章分类
   articleCaseService.updateCate(req, res)

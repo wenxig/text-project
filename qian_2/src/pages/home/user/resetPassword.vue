@@ -103,8 +103,7 @@ function resetFn() {
 }
 </script>
 
-</script> -->
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .el-form {
   width: 500px;
 }

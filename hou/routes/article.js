@@ -19,14 +19,14 @@ router.get(
 // 3、获取-文章详情
 router.get(
   '/info',
-  expressJoi(get_delArticle_schema),
+  // expressJoi(get_delArticle_schema),
   articleController.getArticleDetail
 )
 
 // 4、删除-文章
 router.delete(
   '/info',
-  expressJoi(get_delArticle_schema),
+  // expressJoi(get_delArticle_schema),
   articleController.delArticle
 )
 

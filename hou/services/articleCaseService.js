@@ -1,5 +1,5 @@
 //@ts-check
-const { getData, updateData, updateAllData, deleteData } = require('../models/db').useDb('ysck_article')
+const { getData, updateData, addData, updateAllData, deleteData } = require('../models/db').useDb('ev_article')
 
 const articleCaseService = {
   // 获取 - 文章分类
@@ -15,7 +15,13 @@ const articleCaseService = {
 
   // 增加 - 文章分类：查重
   checkArtCate: (req, res) => {
-    getData({ $or: [req.body.cate_name, req.body.cate_alias] }).then((rows) => {
+    getData({
+      $or: [
+        { cate_name: req.body.cate_name },
+        { cate_alias: req.body.cate_alias }
+      ]
+    }).then((rows) => {
+      console.log('row', rows);
       // 1、分类名称 和 分类别名 都被占用
       if (rows.length === 2) return res.codeMsg('此分类已存在1！')
       if (
@@ -33,12 +39,19 @@ const articleCaseService = {
 
       if (rows.length === 1 && rows[0].cate_alias === req.body.cate_alias)
         return res.codeMsg('分类别名被占用，请更换后重试！')
+    }).catch((err) => {
+      console.log(err);
+      return res.codeMsg('新增文章分类失败！')
     })
   },
 
   // 增加 - 文章分类：添加到数据库
   addArtCate: (req, res) => {
-    updateAllData(req.body).then(() => res.codeMsg('新增文章分类成功！', 0))
+    const data = {
+      ...req.body,
+      id: req.query.id
+    }
+    addData([data]).then(() => res.codeMsg('新增文章分类成功！', 0))
   },
 
   // 删除 - 文章分类：分类是否存在
@@ -50,7 +63,8 @@ const articleCaseService = {
 
   // 删除 - 文章分类：删除文章分类
   delArtCateList: (req, res) => {
-    deleteData({ id: req.query.id })
+    console.log(req.query.id);
+    deleteData({ id: req.query.id.toString() })
       .then(() => res.codeMsg('删除文章分类成功！', 0))
       .catch(() => res.codeMsg('删除文章分类失败！'))
   },
@@ -66,39 +80,18 @@ const articleCaseService = {
       .catch(() => res.codeMsg('获取文章分类数据失败！'))
   },
 
-  // 更新 - 文章分类：查重
-  checkArtCateAll: (req, res) => {
-    getData({
-      $and: [
-        { $not: { id: req.body.id } },
-        {
-          $or: [
-            { cate_name: req.body.cate_name },
-            { cate_alias: req.body.cate_alias }
-          ]
-        }
-      ],
-    }).then((rows) => {
-      if (
-        rows.length === 1 &&
-        rows[0].cate_name === req.body.cate_name &&
-        rows[0].cate_alias === req.body.cate_alias
-      ) {
-        return res.codeMsg('此分类已存在！')
-      }
-      // 分类名称 或 分类别名 被占用
-      if (rows.length === 1 && rows[0].cate_name === req.body.cate_name)
-        return res.codeMsg('此分类已存在！')
-      if (rows.length === 1 && rows[0].cate_alias === req.body.cate_alias)
-        return res.codeMsg('分类别名被占用，请更换后重试！')
-    }).catch(() => res.codeMsg('此分类已存在！'))
-  },
-
   // 更新 - 文章分类：更新到数据库
   updateCate: (req, res) => {
-    updateAllData(req.body, { id: req.body.id })
-      .then(() => res.codeMsg('更新分类信息成功！', 0))
-      .catch(() => res.codeMsg('更新分类信息失败！'))
+    this.checkArtCateById(req.body.id, (isOk) => {
+      if (!isOk) {
+        return res.codeMsg('分类名被占用，请更换后重试！')
+      }
+      updateData({ id: req.body.id }, {
+        $set: req.body
+      })
+        .then(() => res.codeMsg('更新分类信息成功！', 0))
+        .catch(() => res.codeMsg('更新分类信息失败！'))
+    })
   },
 
   // 更新 - 文章分类图片：更新到数据库
@@ -129,6 +122,18 @@ const articleCaseService = {
       }
     })
   },
+  checkArtCateById(id, ret) {
+    Promise.all([getData({}), getData({ id })]).then(([rows, { [0]: data }]) => {
+      const isCheckOk = rows.findIndex((row) => {
+        const rul1 = row.cate_alias == data.cate_alias
+        const rul2 = row.cate_name == data.cate_name
+        return rul1 || rul2
+      }) == -1;
+      ret(isCheckOk)
+    }).catch((err)=>{
+      console.log(err)
+    })
+  }
 }
 
 module.exports = articleCaseService

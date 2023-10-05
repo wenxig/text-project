@@ -9,6 +9,9 @@ declare module '*.vue' {
 declare module "vue" {
   interface ComponentCustomProperties {
     $formatDate(date: Parameters<typeof dayjs>[0]): string
+    $window: typeof window
   }
 }
 declare module 'vue-cropper'
+declare module 'markdown-it';
+declare module 'markdown-it-abbr'

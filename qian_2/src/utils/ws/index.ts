@@ -5,7 +5,7 @@ const baseURL = import.meta.env.DEV ? "ws://localhost:8080" : "ws://big-event-vu
 const user = useUserStore()
 
 export const req = (url: string, msg: Record<any, any>) => {
-  return new Promise((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     const baseLength = 1000
     const ws = new WebSocket(`${baseURL}${url}`);
     const valStr = JSON.stringify({ id: user.userInfo.id, body: msg })

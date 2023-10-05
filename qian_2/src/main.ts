@@ -14,5 +14,5 @@ app.use(router)
 app.config.globalProperties.$formatDate = (date: Parameters<typeof dayjs>[0]) => {
   return dayjs(date).format('YYYY-MM-DD HH:mm:ss')
 }
-
+app.config.globalProperties.$window = window
 app.mount('#app')

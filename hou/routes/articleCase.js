@@ -38,7 +38,7 @@ router.get(
 // 4、更新-文章分类
 router.put(
   '/info',
-  expressJoi(updateCate_schema),
+  // expressJoi(updateCate_schema),
   articleCaseController.updateCate
 )
 

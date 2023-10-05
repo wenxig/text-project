@@ -3,12 +3,10 @@ import tailwindcss from 'tailwindcss';
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import { dynamicBase } from 'vite-plugin-dynamic-base'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
@@ -22,10 +20,6 @@ export default defineConfig({
       resolvers: [
         ElementPlusResolver(),
       ],
-    }),
-    dynamicBase({
-      publicPath: 'window.__dynamic_base__',
-      transformIndexHtml: false
     })
   ],
   "css": {
@@ -42,7 +36,7 @@ export default defineConfig({
       ]
     }
   },
-  base: process.env.NODE_ENV === "production" ? "/__dynamic_base__/" : "/",
+  base: './',
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

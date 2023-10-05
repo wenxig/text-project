@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { useUserStore } from '@s/index'
-import { ElMessage as Message } from 'element-plus';
+import { ElMessage } from 'element-plus';
 import $router from '@/router/index';
 const $store = useUserStore()
 
@@ -27,17 +27,14 @@ reqAxios.interceptors.request.use(
 )
 
 // 解决token过期问题
-reqAxios.interceptors.response.use(
-  function (response) {
-    if (response.status === 401) {
-      $store.token = ""
-      $router.push('/login')
-      Message.error('用户身份以过期！！')
-      return Promise.reject(response)
-    }
-    return response
+reqAxios.interceptors.response.use((res) => {
+  if ((typeof res.data === 'string') && res.data.startsWith("身份认证")) {
+    ElMessage.error(res.data)
+    $router.replace('/auth/login')
+    return
   }
-)
+  return <any>res
+})
 
 // 导出自定义的axios方法, 供外面调用传参发请求
 export default reqAxios
